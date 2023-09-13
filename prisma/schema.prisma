@@ -1,0 +1,81 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+enum Gender {
+  MAN
+  WOMAN
+}
+
+model Owner {
+  id            String       @default(cuid()) @id
+  name          String
+  address       String
+  phone         String
+  horses        Horse[]
+  
+  @@map(name: "owners")
+}
+
+model Jockey {
+  id            String       @default(cuid()) @id
+  name          String
+  address       String
+  age           Int
+  countOfRaces  Int          @default(0)  @map(name: "count_of_races")
+  points        Int          @default(0)
+  horse         Horse?
+  competitions  Competition[]
+  results       Result[]
+  
+  @@map(name: "jockeys")
+}
+
+model Horse {
+  id        String     @default(cuid()) @id
+  name      String
+  gender    Gender
+  age       Int
+  owner     Owner?   @relation(fields: [ownerId], references: [id])
+  ownerId   String?
+  jockey    Jockey?   @relation(fields: [jockeyId], references: [id])
+  jockeyId  String?   @unique
+  competitions  Competition[]
+  results       Result[]
+
+  @@map(name: "horses")
+}
+
+model Result {
+  id             String        @default(cuid()) @id
+  competition    Competition   @relation(fields: [competitionId], references: [id])
+  competitionId  String
+  jockey         Jockey   @relation(fields: [jockeyId], references: [id])
+  jockeyId       String
+  horse          Horse   @relation(fields: [horseId], references: [id])
+  horseId        String
+  place          Int
+  timeResult     Int  @map(name: "time_result")
+
+  @@map(name: "results")
+}
+
+model Competition {
+  id        String     @default(cuid()) @id
+  name      String?
+  datetime  DateTime
+  place     String
+  horses    Horse[]
+  jockey    Jockey[]
+  results   Result[]
+
+  @@map(name: "competitions")
+}

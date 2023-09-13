@@ -1,60 +1,73 @@
-import React from "react"
-import { GetStaticProps } from "next"
-import Layout from "../components/Layout"
-import Post, { PostProps } from "../components/Post"
-
-export const getStaticProps: GetStaticProps = async () => {
-  const feed = [
-    {
-      id: "1",
-      title: "Prisma is the perfect ORM for Next.js",
-      content: "[Prisma](https://github.com/prisma/prisma) and Next.js go _great_ together!",
-      published: false,
-      author: {
-        name: "Nikolas Burk",
-        email: "burk@prisma.io",
-      },
-    },
-  ]
-  return { 
-    props: { feed }, 
-    revalidate: 10 
-  }
-}
+import React from "react";
+import { GetServerSideProps } from "next";
+import prisma from "@/lib/prisma";
+import { Horse, Jockey, Owner, Result, Competition } from "@prisma/client";
+import { CompetitionCard } from "@/components/CompetitionCard";
+import classes from "../styles/index.module.scss";
+import Head from "next/head";
+import { useRouter } from "next/router";
 
 type Props = {
-  feed: PostProps[]
-}
+  competitions: ({
+    results: ({
+      jockey: Jockey;
+      horse: Horse;
+    } & Result)[];
+    horses: ({
+      jockey: Jockey;
+    } & Horse)[];
+  } & Competition)[];
+};
 
-const Blog: React.FC<Props> = (props) => {
+export default function MainPage({ competitions }: Props) {
+  const router = useRouter();
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>Horses | Competitions</title>
+      </Head>
       <div className="page">
-        <h1>Public Feed</h1>
+        <h1>All competitions</h1>
+        <button className={classes.btn} onClick={(e) => router.push("/createCompetition")}>
+          Add Competition
+        </button>
         <main>
-          {props.feed.map((post) => (
-            <div key={post.id} className="post">
-              <Post post={post} />
-            </div>
-          ))}
+          <div className={classes.competitions_list}>
+            {competitions.map((competition) => (
+              <div key={competition.id}>
+                <CompetitionCard competition={competition} />
+              </div>
+            ))}
+          </div>
         </main>
       </div>
-      <style jsx>{`
-        .post {
-          background: white;
-          transition: box-shadow 0.1s ease-in;
-        }
-
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
-        }
-
-        .post + .post {
-          margin-top: 2rem;
-        }
-      `}</style>
-    </Layout>
-  )
+    </>
+  );
 }
 
-export default Blog
+export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
+  let competitions = await prisma.competition.findMany({
+    include: {
+      results: {
+        include: {
+          horse: true,
+          jockey: true,
+        },
+        orderBy: {
+          place: "asc",
+        },
+      },
+      horses: {
+        include: {
+          jockey: true,
+        },
+      },
+    },
+  });
+
+  return {
+    props: {
+      competitions: JSON.parse(JSON.stringify(competitions)),
+    },
+  };
+};

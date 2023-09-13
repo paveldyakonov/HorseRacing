@@ -1,0 +1,25 @@
+.card {
+    width: 80vw;
+    padding: 10px;
+    border: 2px solid gray;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+
+    & .name_and_time {
+        width: 40vw;
+    }
+
+    &__results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        & .result {
+            display: flex;
+            gap: 10px;
+        }
+    }
+}
