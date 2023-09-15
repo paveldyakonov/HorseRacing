@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { GetServerSideProps } from "next";
 import prisma from "@/lib/prisma";
-import { Horse, Jockey, Owner, Result, Competition, Gender } from "@prisma/client";
-import { CompetitionCard } from "@/components/CompetitionCard";
-import classes from "../styles/createCompetition.module.scss";
+import { Gender } from "@prisma/client";
 import Head from "next/head";
 import Select from "react-select";
 import { useRouter } from "next/router";
@@ -157,12 +155,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const ownersList = owners.map((owner) => ({ value: owner.id, label: owner.name }));
   const genderList = [
     {
-      value: Gender.MAN,
-      label: Gender.MAN,
+      value: Gender.MALE,
+      label: Gender.MALE,
     },
     {
-      value: Gender.WOMAN,
-      label: Gender.WOMAN,
+      value: Gender.FEMALE,
+      label: Gender.FEMALE,
     },
   ];
 
@@ -178,7 +176,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 
   return {
     props: {
-      //jockeys: JSON.parse(JSON.stringify(accessJockeys)),
       jockeysList,
       ownersList,
       genderList,

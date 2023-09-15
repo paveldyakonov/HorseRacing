@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "next",
+    "dev": "next -p 8080",
     "build": "prisma generate && next build",
-    "start": "next start"
+    "start": "next start -p 8080"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@prisma/client": "^5.2.0",
+    "@prisma/client": "^5.3.1",
     "@vercel/postgres": "^0.4.1",
     "next": "12.0.10",
     "nextjs-progressbar": "^0.0.16",
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@types/node": "17.0.14",
     "@types/react": "17.0.38",
-    "prisma": "^5.2.0",
+    "prisma": "^5.3.1",
     "typescript": "^5.2.2"
   }
 }
